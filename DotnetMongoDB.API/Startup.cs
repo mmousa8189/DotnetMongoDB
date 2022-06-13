@@ -1,4 +1,5 @@
 using DotnetMongoDB.API.Contracts;
+using DotnetMongoDB.API.Repository;
 using DotnetMongoDB.API.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,7 +32,7 @@ namespace DotnetMongoDB.API
         {
             services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDbSettings"));
             services.AddSingleton<IMongoDbSettings>(serviceProvider =>  serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value);
-
+            services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
