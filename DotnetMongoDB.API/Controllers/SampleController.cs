@@ -22,8 +22,8 @@ namespace DotnetMongoDB.API.Controllers
         {
             var person = new Person()
             {
-                FirstName = "John",
-                LastName = "Doe"
+                FirstName = firstName,
+                LastName = lastName
             };
 
             await _peopleRepository.InsertOneAsync(person);
