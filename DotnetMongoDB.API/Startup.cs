@@ -1,6 +1,7 @@
 using DotnetMongoDB.API.Contracts;
 using DotnetMongoDB.API.Repository;
 using DotnetMongoDB.API.Settings;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -14,6 +15,7 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace DotnetMongoDB.API
@@ -33,7 +35,17 @@ namespace DotnetMongoDB.API
             services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDbSettings"));
             services.AddSingleton<IMongoDbSettings>(serviceProvider =>  serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value);
             services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
-            services.AddControllers();
+            //AddFluentValidation used to automatically find all the validators in a specific assembly using an extension method.
+            services.AddControllers().AddFluentValidation(fv =>
+            {
+                fv.ImplicitlyValidateChildProperties = true;
+                fv.ImplicitlyValidateRootCollectionElements = true;
+
+                fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+                // Other way to register validators
+                //fv.RegisterValidatorsFromAssemblyContaining<Startup>();
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DotnetMongoDB.API", Version = "v1" });
